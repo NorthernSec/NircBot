@@ -42,11 +42,17 @@ class PluginManager():
             i = importlib.import_module(path.replace('/', '.'))
             plugin = getattr(i, path.split('/')[-1])()
             if mode.lower() == 'load':
-                if not hasattr(plugin, 'loadSettings:'):
+                if not hasattr(plugin, 'loadSettings'):
                     logging.info("%s takes no settings"%path)
                 else:
-                    plugin.loadSettings(settings)
-                    logging.debug("%s loaded settings %s"%(path, settings))
+                    try:
+                        settings = {x[0].strip(): x[1].strip()
+                                      for x in [y.split('=')
+                                        for y in settings.split(';')]}
+                        plugin.loadSettings(settings)
+                        logging.debug("%s loaded settings %s"%(path, settings))
+                    except:
+                        logging.error("Arguments for %s are invalid"%plugin)
             self.plugins[plugin.name] = plugin
             for hook in [k for k in self.hooks.keys() if k != 'command']:
                 if hasattr(plugin, hook):
@@ -62,7 +68,7 @@ class PluginManager():
             logging.info("Plugin %s loaded"%plugin.name)
         except Exception as e:
             print(e)
-            logging.warning("Could not load %s"%path)
+            logging.error("Could not load %s"%path)
 
 
     def unload_plugin(self, name):
