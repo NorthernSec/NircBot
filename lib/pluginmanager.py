@@ -97,15 +97,20 @@ class PluginManager():
         nick, ident, host = user_split(user)
 
         for plugin in self.hooks.get(action, []):
-            f = getattr(plugin, action)
-            f(self.bot, msg, nick, channel, ident, host, **args)
+            try:
+                f = getattr(plugin, action)
+                f(self.bot, msg, nick, channel, ident, host, **args)
+            except:
+                self.bot.msg("Pluggin %s encountered an error!"%plugin.name)
 
     def exec_if_command(self, command, args, user, channel):
-        nick, ident, host = user_split(user)
-        logging.debug("Parsing command %s"%command)
-        print(self.hooks['command'])
-        plug = self.hooks['command'].get(command)
-        if plug:
-            logging.debug("Performing command %s (plugin %s)"%(command, plug.name))
-            plug.command(self.bot, command, args, nick, channel, ident, host)
-
+        try:
+            nick, ident, host = user_split(user)
+            logging.debug("Parsing command %s"%command)
+            plug = self.hooks['command'].get(command)
+            if plug:
+                logging.debug("Performing command %s (plugin %s)"%(command, plug.name))
+                plug.command(bot=self.bot, command=command, arguments=args,
+                             nick=nick, channel=channel, ident=ident, host=host)
+        except:
+            self.bot.msg(channel, "An error happened trying to perform this command")
