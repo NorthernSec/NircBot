@@ -49,10 +49,10 @@ class PluginManager():
                         settings = {x[0].strip(): x[1].strip()
                                       for x in [y.split('=')
                                         for y in settings.split(';')]}
-                        plugin.loadSettings(settings)
+                        plugin.loadSettings(settings, bot=self.bot)
                         logging.debug("%s loaded settings %s"%(path, settings))
                     except:
-                        logging.error("Arguments for %s are invalid"%plugin)
+                        logging.error("Arguments for %s are invalid"%plugin.name)
             self.plugins[plugin.name] = plugin
             for hook in [k for k in self.hooks.keys() if k != 'command']:
                 if hasattr(plugin, hook):
@@ -66,8 +66,7 @@ class PluginManager():
                         self.hooks['command'][command] = plugin
 
             logging.info("Plugin %s loaded"%plugin.name)
-        except Exception as e:
-            print(e)
+        except:
             logging.error("Could not load %s"%path)
 
 

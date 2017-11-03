@@ -10,13 +10,14 @@ class Bot(irc.IRCClient):
     def __init__(self):
         self.trigger = '.'
         self.plugManager = PluginManager(self)
-        self.plugManager.load_plugins()
         logging.debug("Bot created")
 
     def signedOn(self):
-         for chan in self.factory.channels:
-             logging.info("Joining %s"%chan)
-             self.join(chan)
+        self.plugManager.load_plugins()
+
+        for chan in self.factory.channels:
+            logging.info("Joining %s"%chan)
+            self.join(chan)
 
     def userJoined(self, user, channel):
         self.plugManager.perform('user_join', None, user, channel)

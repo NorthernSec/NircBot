@@ -25,6 +25,5 @@ class Google:
             bot.say(channel, "No results.")
 
 
-    def loadSettings(self, settings):
-        print(settings)
+    def loadSettings(self, settings, **args):
         self.api = settings['api']
