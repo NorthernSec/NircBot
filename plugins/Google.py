@@ -10,8 +10,13 @@ class Google:
     commands = ['google', 'g']
     h = html.parser.HTMLParser()
 
+    def __init__(self, **args):
+        pass
 
-    def command(self, bot, command, arguments, nick, channel, ident, host, **args):
+    def command(self, bot=None, command=None, arguments=None, nick=None,
+                      channel=None, ident=None, host=None, **args):
+        if not (bot and command and arguments and channel and nick):
+            return
         req = urllib.request.Request(self.url%(self.api, urllib.parse.quote(arguments)))
         data = urllib.request.urlopen(req).read()
         data = json.loads(str(data,encoding='utf-8'))
