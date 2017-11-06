@@ -1,5 +1,6 @@
 import importlib
 import logging
+import traceback
 
 from lib.toolkit import nsplit, user_split
 
@@ -40,7 +41,7 @@ class PluginManager():
                 return
             # import plugin and make it into an object
             i = importlib.import_module(path.replace('/', '.'))
-            plugin = getattr(i, path.split('/')[-1])()
+            plugin = getattr(i, path.split('/')[-1])(bot=self.bot)
             if mode.lower() == 'load':
                 if not hasattr(plugin, 'loadSettings'):
                     logging.info("%s takes no settings"%path)
@@ -66,7 +67,9 @@ class PluginManager():
                         self.hooks['command'][command] = plugin
 
             logging.info("Plugin %s loaded"%plugin.name)
-        except:
+        except Exception as e:
+            print(e)
+            print(traceback.format_exc())
             logging.error("Could not load %s"%path)
 
 
@@ -82,7 +85,8 @@ class PluginManager():
                 plugin.unload()
             del self.plugins[name]
             logging.info("Plugin %s unloaded"%name)
-        except:
+        except Exception as e:
+            print(e)
             logging.warning("Could not unload plugin %s"%name)
 
 
@@ -117,5 +121,6 @@ class PluginManager():
                 logging.debug("Performing command %s (plugin %s)"%(command, plug.name))
                 plug.command(bot=self.bot, command=command, arguments=args,
                              nick=nick, channel=channel, ident=ident, host=host)
-        except:
+        except Exception as e:
+            logging.error("%s had an error: %s"%(command, e))
             self.bot.msg(channel, "An error happened trying to perform this command")
