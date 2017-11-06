@@ -4,7 +4,9 @@ def nsplit(data, parts, sepparator=' \t'):
         sepparator = sepparator[0]
         for ch in changelist:
             data = data.replace(ch, sepparator)
+    data = sepparator.join([x for x in data.split(sepparator) if x])
     data = data.split(sepparator, parts-1)
+    data = [x.strip(sepparator) for x in data]
     data.extend([None]*(parts-len(data)))
     return data
 
