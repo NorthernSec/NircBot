@@ -1,10 +1,10 @@
 class BotManager:
     admins = []
     name   = "BotManager"
-    commands = ['join', 'part']
+    commands = ['join', 'part', 'nick']
 
     def command(self, bot=None, command=None, arguments=None, nick=None,
-                      channel=None, ident=None, host=None):
+                      channel=None, ident=None, host=None, **args):
         if not (bot and command and channel and arguments):
             return
         if nick not in self.admins:
