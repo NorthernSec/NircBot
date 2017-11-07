@@ -29,7 +29,7 @@ class PluginManager():
                       'bot_kick':       [],
                       'bot_privmsg':    [],
 
-                      'command':        {},
+                      'commands':       {},
                       'mode_change':    [],
                       'topic_change':   []}
         logging.debug("PluginManager created")
@@ -55,16 +55,16 @@ class PluginManager():
                     except:
                         logging.error("Arguments for %s are invalid"%plugin.name)
             self.plugins[plugin.name] = plugin
-            for hook in [k for k in self.hooks.keys() if k != 'command']:
+            for hook in [k for k in self.hooks.keys() if k != 'commands']:
                 if hasattr(plugin, hook):
                     self.hooks[hook].append(plugin)
             if hasattr(plugin, 'command') and hasattr(plugin, 'commands'):
                 for command in getattr(plugin, 'commands'):
-                    current = self.hooks['command'].get(command)
+                    current = self.hooks['commands'].get(command)
                     if current:
                         logging.warning("Command `%s` is already loaded by %s. Conflicting with %s"%(command, current.name, plugin.name))
                     else:
-                        self.hooks['command'][command] = plugin
+                        self.hooks['commands'][command] = plugin
 
             logging.info("Plugin %s loaded"%plugin.name)
         except Exception as e:
@@ -78,9 +78,9 @@ class PluginManager():
             plugin = self.plugins[name]
             for hook in self.hooks.keys():
                 self.hooks[hook] = [h for h in self.hooks[hook] if h.name != name]
-            for command, plugin in self.hooks['command'].items():
+            for command, plugin in self.hooks['commands'].items():
                 if name == plugin.name:
-                    del self.hooks['command'][command]
+                    del self.hooks['commands'][command]
             if hasattr(plugin, "unload"):
                 plugin.unload()
             del self.plugins[name]
@@ -116,7 +116,7 @@ class PluginManager():
         try:
             nick, ident, host = user_split(user)
             logging.debug("Parsing command %s"%command)
-            plug = self.hooks['command'].get(command)
+            plug = self.hooks['commands'].get(command)
             if plug:
                 logging.debug("Performing command %s (plugin %s)"%(command, plug.name))
                 plug.command(bot=self.bot, command=command, arguments=args,
