@@ -76,11 +76,9 @@ class PluginManager():
     def unload_plugin(self, name):
         try:
             plugin = self.plugins[name]
-            for hook in self.hooks.keys():
+            for hook in [h for h in self.hooks.keys() if h != 'commands']:
                 self.hooks[hook] = [h for h in self.hooks[hook] if h.name != name]
-            for command, plugin in self.hooks['commands'].items():
-                if name == plugin.name:
-                    del self.hooks['commands'][command]
+            self.hooks['commands'] = {c: h for c, h in self.hooks['commands'].items() if h.name != name}
             if hasattr(plugin, "unload"):
                 plugin.unload()
             del self.plugins[name]
