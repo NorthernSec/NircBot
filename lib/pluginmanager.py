@@ -41,7 +41,7 @@ class PluginManager():
                 return
             # import plugin and make it into an object
             i = importlib.import_module(path.replace('/', '.'))
-            plugin = getattr(i, path.split('/')[-1])(bot=self.bot)
+            plugin = getattr(i, path.split('/')[-1])()
             if mode.lower() == 'load':
                 if not hasattr(plugin, 'loadSettings'):
                     logging.info("%s takes no settings"%path)

@@ -11,7 +11,7 @@ class Reminders:
 
     def __init__(self, **args):
         self.reminders = []
-        self.bot        = args.get('bot')
+        self.bot        = None
         thread = threading.Thread(target=self._reaper)
         thread.daemon = True
         thread.start()
@@ -30,6 +30,7 @@ class Reminders:
                       channel=None, ident=None, host=None, **args):
         if not (bot and command and arguments and channel and nick):
             return
+        if not self.bot: self.bot = bot
 
         if   command == 'remind':
             try:
