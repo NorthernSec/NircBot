@@ -1,8 +1,11 @@
 import importlib
 import logging
+import re
 import traceback
 
 from lib.toolkit import nsplit, user_split
+
+PIPEREGEX = re.compile('''((?:[^\|"']|"[^"]*"|'[^']*')+)''')
 
 class PluginManager():
     def __init__(self, bot):
@@ -112,13 +115,33 @@ class PluginManager():
 
     def exec_if_command(self, command, args, user, channel):
         try:
+            piped = PIPEREGEX.split(args)[1::2]
+            piped = [x.strip() for x in piped]
+            print(piped)
+            if len(piped) > 1: # pipes were found
+                args  = piped[0]
+                piped = piped[1:]
+            else:
+                piped = None
             nick, ident, host = user_split(user)
             logging.debug("Parsing command %s"%command)
             plug = self.hooks['commands'].get(command)
             if plug:
                 logging.debug("Performing command %s (plugin %s)"%(command, plug.name))
-                plug.command(bot=self.bot, command=command, arguments=args,
-                             nick=nick, channel=channel, ident=ident, host=host)
+                print("Executing %s with %s"%((command, args)))
+                data = plug.command(bot=self.bot, command=command, arguments=args,
+                                    nick=nick, channel=channel, ident=ident, host=host)
+                if piped:
+                    command, args = nsplit(piped[0], 2) # Get args from command
+                    del piped[0]
+                    if not args: args = ""
+                    # Re-add the pipes
+                    args = ("%s %s"%(args, data)).strip() + '|'.join(piped)
+                    print("follwing up with: %s %s"%((command, args)))
+                    self.exec_if_command(command, args, user, channel)
+                else:
+                    if data:
+                        self.bot.say(channel, data)
         except Exception as e:
             logging.error("%s had an error: %s"%(command, e))
             self.bot.msg(channel, "An error happened trying to perform this command")
