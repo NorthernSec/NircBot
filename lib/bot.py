@@ -43,8 +43,6 @@ class Bot(irc.IRCClient):
         self.plugManager.perform('user_action', message, user, channel)
 
     def noticed(self, user, channel, message):
-        if channel != self.irc.nick:
-            channel = self.irc.channels.get(channel)
         self.plugManager.perform('user_notice', message, user, channel)
 
     def userRenamed(self, oldname, newname):
