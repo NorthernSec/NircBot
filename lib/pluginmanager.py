@@ -5,7 +5,7 @@ import traceback
 
 from lib.toolkit import nsplit, user_split
 
-PIPEREGEX = re.compile('''((?:[^\|"']|"[^"]*"|'[^']*')+)''')
+PIPEREGEX = re.compile('''\|(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''')
 
 class PluginManager():
     def __init__(self, bot):
@@ -115,9 +115,7 @@ class PluginManager():
 
     def exec_if_command(self, command, args, user, channel):
         try:
-            piped = PIPEREGEX.split(args)[1::2]
-            piped = [x.strip() for x in piped]
-            print(piped)
+            piped = [x.strip() for x in PIPEREGEX.split(args)]
             if len(piped) > 1: # pipes were found
                 args  = piped[0]
                 piped = piped[1:]
