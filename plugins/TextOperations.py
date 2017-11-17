@@ -1,6 +1,6 @@
 class TextOperations:
     name     = "TextOperations"
-    commands = ['say', 'reverse', 'upper', 'lower']
+    commands = ['say', 'reverse', 'upper', 'lower', 'capitalize']
     def __init__(self, **args):
         pass
 
@@ -8,7 +8,8 @@ class TextOperations:
                       channel=None, ident=None, host=None, **args):
         if not (bot and arguments):
             return
-        if   command == 'say':     return arguments
-        elif command == 'reverse': return arguments[::-1]
-        elif command == 'upper':   return arguments.upper()
-        elif command == 'lower':   return arguments.lower()
+        if   command == 'say':         return arguments
+        elif command == 'reverse':     return arguments[::-1]
+        elif command == 'upper':       return arguments.upper()
+        elif command == 'lower':       return arguments.lower()
+        elif command == 'capitalize':  return arguments.capitalize()
